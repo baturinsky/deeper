@@ -1,0 +1,14 @@
+{
+  "name": "esbuild-boilerplate",
+  "version": "1.0.0",
+  "description": "A ES project",
+  "author": "",
+  "private": true,
+  "scripts": {
+    "run": "node build.js"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "esbuild": "^0.11.13"
+  }
+}

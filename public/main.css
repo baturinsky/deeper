@@ -1,0 +1,28 @@
+#C{
+  width: 512px;
+  height: 512px;
+  image-rendering: pixelated;
+  cursor: pointer;
+
+  position:relative;
+}
+
+#field{
+  overflow: hidden;
+}
+
+.centered-content {
+  top:0;
+  left:0;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+body{
+  background: #000;
+}
