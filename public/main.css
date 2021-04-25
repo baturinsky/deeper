@@ -3,6 +3,17 @@
   src: url("prstartk.ttf") format("truetype");
 }
 
+@keyframes rainbow {
+  0% {color: hsl(0, 100%, 50%);}
+  14% {color: hsl(30,100%,50%);}
+  28% {color: hsl(60,100%,50%);}
+  42% {color: hsl(120,100%,50%);}
+  56% {color:  hsl(240,100%,50%);}
+  70% {color: hsl(280,100%,50%);}
+  84% {color: hsl(320,100%,50%);}
+  100% {color: hsl(255, 100%, 50%);}
+}
+
 #C {
   width: 512px;
   height: 512px;
@@ -14,30 +25,62 @@
 #frame {
   overflow: hidden;
   border: solid 2px #fff1e8;
-  margin: 4px;
+  margin: 20px;
 }
 
-#center {
+#fieldFrame {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-#outro {
+#outro{
   position: relative;
-  width: 50%;
   border: solid 2px #fff1e8;
+  cursor: default;
   z-index: 1;
   top: 40px;
   padding: 10px;
-  background: rgba(155, 155, 155, 0.8);
-  visibility: hidden;
+  color: #fff;
+  background: rgba(128, 128, 128, 0.8);
+}
+
+#upgrades {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: auto 150px;
+  min-width: 50%;
+}
+
+#upgrades > *{
+  padding: 3px 10px;
+}
+
+#upgrades > *:nth-child(4n-1) {
+  background: rgba(128, 128, 128, 0.6);
+}
+
+
+button{
+  font-family: MainFont;
+  cursor: pointer;
+}
+
+button:hover{
+  background: #fff;
+}
+
+#newGame{
+  padding: 10px;
+  margin: 20px;
+  font-size: large;
 }
 
 #letters{
   width:0;
   height:0;
   overflow: visible;
+  position:relative;
   pointer-events: none;
 }
 
@@ -72,4 +115,14 @@ body {
 
 div {
   text-align: center;
+}
+
+
+em {
+  color: #0f0;
+  font-style: normal;
+}
+
+.rainbow{
+  animation: rainbow 10s infinite alternate;;
 }
