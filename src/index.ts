@@ -208,7 +208,7 @@ function balance(a: number[]) {
 }
 
 function upgradeCost(unlock, tier) {
-  return baseUpgradeCost * (unlock + 1) * 2 ** tier;
+  return baseUpgradeCost * (unlock + 1) * ((unlock == uFrF || unlock == uFrD)?4:2) ** tier;
 }
 
 function unlockUpgradeCost(unlock) {
