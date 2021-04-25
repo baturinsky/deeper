@@ -161,4 +161,5 @@ em {
 
 #text{
   user-select: none;
+  margin: 5px;
 }

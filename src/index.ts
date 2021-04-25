@@ -60,13 +60,6 @@ const uWider = 0,
   uEnrF = 14,
   uEnrP = 15;
 
-
-function sound() {
-  if(window["zzfxX"] == null)
-    window["zzfxX"] = new(window.AudioContext);
-  window["zzfx"](...[2,,10,,.07,.15,1,.4,,,,,,,,,.02,.79,.06]);
-}
-
 const upgradeConf = [
   {
     text: (n) =>
