@@ -9,34 +9,95 @@
       255
     ] : null;
   }
-  var funkyfuture = `#ab1f65
-#ff4f69
-#ff8142
-#ffda45
-#3368dc
-#49e7ec
-#2b0f54
-#fff7f8`;
+  var piko8 = `#5F574F
+#AB5236
+#83769C
+#1D2B53
+#7E2553
+#FF77A8
+#008751
+#C2C3C7
+#FFF1E8
+#FFA300
+#FFEC27
+#00E436
+#29ADFF
+#FF004D`;
   var colors = [
     [255, 255, 255, 0],
-    ...funkyfuture.split("\n").map((s) => hexToRGB(s))
+    ...piko8.split("\n").map((s) => hexToRGB(s))
   ];
+  var price = colors.map((c, i) => i < 4 ? 1 : 2 ** (i - 3));
   var captured = 100;
+  var frameMargin = 1.5;
+  var colorsNumber = 14;
+  var maxScale = 32;
+  function weightedRandom(a, rng) {
+    let sum = a.reduce((x, y) => x + y);
+    let roll = rng() * sum - a[0];
+    let i = 0;
+    while (roll >= 0)
+      roll -= a[++i];
+    return i;
+  }
+  function balance(a) {
+    let sum = a.reduce((x, y) => x + y, 0);
+    return a.map((v) => v / sum);
+  }
   var Field = class {
-    constructor(w = 8, h = 16) {
+    constructor(w, h) {
       this.cells = [];
       this.lastColor = 1;
+      this.depth = 0;
+      this.scale = 16;
+      this.money = 0;
+      this.turn = 0;
+      this.alive = true;
+      this.depthCellChances = [];
       this.w = w;
       this.h = h;
-      this.cells = [...new Array(w * h)].map((v, i) => i < w ? captured : ~~(1 + Math.random() * 6));
+      this.depthCellChances[0] = balance([...new Array(colorsNumber)].map((n, i) => i < 4 ? 1 : 0));
+      for (let depth = 1; depth < this.h * 2; depth++) {
+        this.addDepthCellChances();
+      }
+      this.cells = [...new Array(w * h)].map((v, i) => i < w ? captured : this.randomCellColor(i));
       this.play(this.lastColor);
-      this.canvas = document.createElement("canvas");
-      this.canvas.width = w;
-      this.canvas.height = h;
-      this.cx = this.canvas.getContext("2d");
+      this.updateScale();
+      this.updateStatus();
     }
-    draw(C, ifPlay, captureAlpha = 255) {
-      let highlight;
+    addDepthCellChances() {
+      let depth = this.depthCellChances.length;
+      this.depthCellChances[depth] = [...this.depthCellChances[depth - 1]];
+      let increasing = Math.min(colorsNumber - 1, 1 + ~~(Math.random() * colorsNumber));
+      if (depth * Math.random() * 8 > increasing ** 2.5)
+        this.depthCellChances[depth][increasing] += 0.03;
+      else
+        this.depthCellChances[depth][increasing] *= 0.3;
+      this.depthCellChances[depth] = balance(this.depthCellChances[depth]);
+    }
+    updateScale() {
+      let maxWidth = window.innerWidth * 0.8;
+      let maxHeight = window.innerHeight * 0.9;
+      this.scale = Math.min(maxWidth / this.w, maxHeight / this.h, maxScale);
+      const C = document.getElementById("C");
+      C.width = this.w;
+      C.style.width = `${this.w * this.scale}px`;
+      C.height = this.h;
+      C.style.height = `${this.h * this.scale}px`;
+      const frame = document.getElementById("frame");
+      frame.style.height = `${(this.h - frameMargin) * this.scale}px`;
+    }
+    randomCellColor(i) {
+      let depth = ~~this.depth + ~~(i / this.w);
+      let color = 1 + weightedRandom(this.depthCellChances[~~depth], () => Math.random());
+      if (Math.random() < 0.01) {
+        return 200;
+      } else {
+        return Math.min(colorsNumber, color);
+      }
+    }
+    draw(C, ifPlay, t) {
+      const cx = C.getContext("2d");
       let wbc = [];
       let capturePossible = false;
       if (ifPlay != null) {
@@ -45,30 +106,56 @@
           capturePossible = true;
         }
       }
-      let captureColor;
-      if (capturePossible) {
+      let captureColor, capturedColor;
+      if (capturePossible && t != null) {
         captureColor = [...colors[this.at(...ifPlay)]];
-        captureColor[3] = captureAlpha;
+        capturedColor = [...captureColor];
+        captureColor[3] = ~~(Math.sin(t / 100) * 40 + 225);
+        capturedColor[3] = ~~(Math.sin(t / 100) * 20 + 225);
       } else {
-        captureColor = colors[this.lastColor];
+        capturedColor = captureColor = [...colors[this.lastColor]];
+        capturedColor[3] = ~~(Math.sin(t / 100) * 20 + 225);
       }
-      let id = this.cx.getImageData(0, 0, this.w, this.h);
+      let id = cx.getImageData(0, 0, this.w, this.h);
       let pixels = id.data;
+      let letters = document.getElementById("letters");
+      letters.innerHTML = "";
+      letters.style.fontSize = `${this.scale / 2}px`;
       for (let i = 0; i < this.cells.length; i++) {
-        pixels.set(this.cells[i] == captured || wbc.includes(i) ? captureColor : colors[this.cells[i]], i * 4);
+        if (this.cells[i] >= 200) {
+          letters.innerHTML += `<div class="letter" style="left:${(i % this.w + 0.27) * this.scale}px;top:${(~~(i / this.w) + 0.3) * this.scale}px">+</div>`;
+        }
+        pixels.set(this.cells[i] == captured ? capturedColor : wbc.includes(i) ? captureColor : colors[this.cells[i]] || [0, 0, 0, 255], i * 4);
       }
-      this.cx.putImageData(id, 0, 0);
-      const ctx = C.getContext("2d");
-      ctx.clearRect(0, 0, C.width, C.height);
-      ctx.drawImage(this.canvas, 0, 0);
+      cx.putImageData(id, 0, 0);
+      letters.style.top = `${-(this.depth - ~~this.depth) * this.scale}px`;
     }
     at(x, y) {
       return this.cells[x + y * this.w];
     }
     play(color) {
-      for (let cell of this.willBeCaptured(color))
-        this.cells[cell] = captured;
-      this.lastColor = color;
+      let wbc = this.willBeCaptured(color);
+      if (wbc.length > 0) {
+        this.money += this.areaPrice(wbc);
+        for (let cell of this.willBeCaptured(color)) {
+          this.cells[cell] = captured;
+        }
+        this.lastColor = color;
+        let newDeepmost = this.depth + ~~(Math.max(...wbc) / this.w);
+        if (newDeepmost) {
+          let newDepth = Math.max(newDeepmost - this.h / 2, this.depth + 0.5 + this.turn * 0.02);
+          this.scrollTo(newDepth);
+          this.updateStatus();
+        }
+        this.turn++;
+        this.checkGameOver();
+        return newDeepmost;
+      } else {
+        return 0;
+      }
+    }
+    checkGameOver() {
+      this.alive = this.cells.find((v) => v == captured) != null;
     }
     willBeCapturedXY([x, y]) {
       let color = this.at(x, y);
@@ -77,6 +164,9 @@
         wbc = [];
       }
       return wbc;
+    }
+    areaPrice(wbc) {
+      return wbc.map((i) => price[this.cells[i]] || 0).reduce((a, b) => a + b, 0);
     }
     willBeCaptured(color) {
       if (color == null || color == captured)
@@ -87,6 +177,8 @@
       while (q.length > 0) {
         let at = q.pop();
         for (let n of nbd) {
+          if (n == -1 && at % this.w == 0 || n == -1 && (at + 1) % this.w == 0)
+            continue;
           if (this.cells[at + n] == color && !q.includes(at + n) && !wbc.includes(at + n)) {
             q.push(at + n);
             wbc.push(at + n);
@@ -95,22 +187,39 @@
       }
       return wbc;
     }
+    scrollTo(toDepth) {
+      if (toDepth <= this.depth)
+        return;
+      let newLayers = ~~toDepth - ~~this.depth;
+      this.cells = this.cells.slice(this.w * newLayers);
+      for (let i = 0; i < newLayers; i++)
+        this.addDepthCellChances();
+      for (let i = 0; i < newLayers * this.w; i++) {
+        this.cells.push(this.randomCellColor(this.cells.length));
+      }
+      this.depth = toDepth;
+    }
+    updateStatus(projectedIncome = 0) {
+      document.getElementById("title").innerHTML = `$${this.money + projectedIncome} | ${this.depth.toFixed(1)} m | turn ${this.turn} ${this.alive ? "" : " | DEAD"}`;
+    }
   };
   window.onload = () => {
-    let field = new Field();
-    const scale = 32;
-    const C = document.getElementById("C");
-    C.width = field.w;
-    C.style.width = `${field.w * scale}px`;
-    C.height = field.h;
-    C.style.height = `${field.h * scale}px`;
+    let field = new Field(24, 24);
     let mouseOver = null;
+    window.addEventListener("resize", () => {
+      field.updateScale();
+    });
+    const C = document.getElementById("C");
+    let text = document.getElementById("text");
+    text.innerHTML = colors.slice(1).map((c, i) => `<span style="color:rgb(${c[0]},${c[1]},${c[2]})">${price[i + 1]}</span> `).join("");
     C.addEventListener("mousemove", (e) => {
-      let [x, y] = [~~(e.offsetX / scale), ~~(e.offsetY / scale)];
+      let [x, y] = [~~(e.offsetX / field.scale), ~~(e.offsetY / field.scale)];
       mouseOver = [x, y];
+      let wbc = field.willBeCapturedXY([x, y]);
+      field.updateStatus(field.areaPrice(wbc));
     });
     C.addEventListener("click", (e) => {
-      let [x, y] = [~~(e.offsetX / scale), ~~(e.offsetY / scale)];
+      let [x, y] = [~~(e.offsetX / field.scale), ~~(e.offsetY / field.scale)];
       field.play(field.at(x, y));
       field.draw(C);
     });
@@ -122,7 +231,7 @@
     const frameLength = 50;
     window.setInterval(() => {
       t += frameLength;
-      field.draw(C, mouseOver, ~~(Math.sin(t / 100) * 20 + 235));
+      field.draw(C, mouseOver, t);
     }, frameLength);
   };
 })();

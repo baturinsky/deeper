@@ -1,19 +1,60 @@
-#C{
+@font-face {
+  font-family: "MainFont";
+  src: url("prstartk.ttf") format("truetype");
+}
+
+#C {
   width: 512px;
   height: 512px;
   image-rendering: pixelated;
   cursor: pointer;
-
-  position:relative;
+  position: relative;
 }
 
-#field{
+#frame {
   overflow: hidden;
+  border: solid 2px #fff1e8;
+  margin: 4px;
+}
+
+#center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#outro {
+  position: relative;
+  width: 50%;
+  border: solid 2px #fff1e8;
+  z-index: 1;
+  top: 40px;
+  padding: 10px;
+  background: rgba(155, 155, 155, 0.8);
+  visibility: hidden;
+}
+
+#letters{
+  width:0;
+  height:0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.letter {
+  position: relative;
+  top: 32px;
+  left: 32px;
+  width: 0px;
+  height: 0px;
+  color: red;
+  text-align: center;
+  z-index: 1;
 }
 
 .centered-content {
-  top:0;
-  left:0;
+  top: 0;
+  left: 0;
   position: fixed;
   display: flex;
   flex-direction: column;
@@ -23,6 +64,12 @@
   width: 100%;
 }
 
-body{
+body {
   background: #000;
+  color: #fff;
+  font-family: MainFont;
+}
+
+div {
+  text-align: center;
 }

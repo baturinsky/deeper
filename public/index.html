@@ -1,15 +1,27 @@
 <html>
-  <head>
-    <link rel="stylesheet" href="main.css" />
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
-    <script src="bundle.js"></script>
-  </head>
-  <body>
-    <div class="centered-content">
-      <div id="field">
-        <canvas id="C"></canvas>
+
+<head>
+  <link rel="stylesheet" href="main.css" />
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <script src="bundle.js"></script>
+</head>
+
+<body>
+  <div class="centered-content">
+    <div id="center">
+      <div id="title"></div>
+      <div id="frame">
+        <div id="letters"></div>
+        <canvas id="C">            
+          </canvas>
       </div>
+      <div id="text">text</div>
     </div>
-    <div id="ui"></div>
-  </body>
+  </div>
+  <div id="ui"></div>
+  <div class="centered-content" style="pointer-events: none;">
+    <div id="outro">Outro<br/>Outro<br/>Outro<br/></div>
+  </div>
+</body>
+
 </html>
