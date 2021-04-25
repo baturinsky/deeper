@@ -3,6 +3,12 @@
   src: url("prstartk.ttf") format("truetype");
 }
 
+
+@keyframes blink {
+  0% {transform: scale(1);}
+  100% {transform: scale(1.1);}
+}
+
 @keyframes rainbow {
   0% {color: hsl(0, 100%, 50%);}
   14% {color: hsl(30,100%,50%);}
@@ -77,6 +83,7 @@ button:hover{
   padding: 10px;
   margin: 20px;
   font-size: large;
+  animation: blink 1s infinite alternate ease-in-out;
 }
 
 #letters{
@@ -127,11 +134,31 @@ em {
 }
 
 .rainbow{
-  animation: rainbow 10s infinite alternate;;
+  animation: rainbow 10s infinite alternate;
 }
 
 #exit,  #resetProgress{
   position:absolute;
   right:10px;
   bottom:10px;
+}
+
+@keyframes disappear {
+  0% {opacity: 1; transform: translateY(0);}
+  100% {opacity: 0; transform: translateY(-100px);}
+}
+
+.particle{
+  z-index: 2;
+  height: 0;
+  width: 0;
+  display: block;
+  position: relative;
+  animation: disappear 0.7s ease-out;
+  opacity: 0;
+  user-select: none;
+}
+
+#text{
+  user-select: none;
 }

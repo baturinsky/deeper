@@ -94,6 +94,7 @@
 #29ADFF
 #FF004D
 #FF00AA`;
+  var hexColors = ["#FFF", ...piko8.split("\n")];
   var colors = [
     [255, 255, 255, 0],
     ...piko8.split("\n").map((s) => hexToRGB(s))
@@ -309,9 +310,9 @@
       }
       let captureColor, capturedColor;
       colors[glubinium] = [
-        ~~(Math.sin(t / 100) * 40 + 225),
-        ~~(Math.sin(t / 87) * 40 + 225),
-        ~~(Math.sin(t / 59) * 40 + 225),
+        ~~(Math.sin(t / 200) * 80 + 125),
+        ~~(Math.sin(t / 277) * 80 + 125),
+        ~~(Math.sin(t / 335) * 80 + 125),
         255
       ];
       if (capturePossible && t != null) {
@@ -351,6 +352,18 @@
     at(x, y) {
       return this.cells[x + y * this.w];
     }
+    makeParticle(cell) {
+      let p = document.createElement("div");
+      p.className = "particle";
+      p.innerHTML = "$";
+      p.style.left = `${this.scale * (cell % this.w)}px`;
+      p.style.top = `${this.scale * (~~(cell / this.w) - 2)}px`;
+      p.style.color = hexColors[this.cells[cell]];
+      p.style.fontSize = `${5 + (price[this.cells[cell]] * this.totalMultiplier()) ** 0.3}px`;
+      let frame = document.getElementById("frame");
+      frame.insertBefore(p, frame.firstChild);
+      setTimeout(() => p.remove(), 1e3);
+    }
     play(color) {
       let wbc = this.willBeCaptured(color);
       if (wbc.length > 0) {
@@ -367,6 +380,7 @@
               }
             }
           }
+          this.makeParticle(cell);
           this.cells[cell] = captured;
         }
         if (color <= glubinium)

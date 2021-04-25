@@ -60,6 +60,13 @@ const uWider = 0,
   uEnrF = 14,
   uEnrP = 15;
 
+
+function sound() {
+  if(window["zzfxX"] == null)
+    window["zzfxX"] = new(window.AudioContext);
+  window["zzfx"](...[2,,10,,.07,.15,1,.4,,,,,,,,,.02,.79,.06]);
+}
+
 const upgradeConf = [
   {
     text: (n) =>
@@ -155,9 +162,12 @@ const piko8 = `#5F574F
 #FF004D
 #FF00AA`;
 
+
+const hexColors = ["#FFF", ...piko8.split("\n")]
+
 const colors = [
   [255, 255, 255, 0],
-  ...piko8.split("\n").map((s) => hexToRGB(s)),
+  ...piko8.split("\n").map((s) => hexToRGB(s))
 ];
 
 const captured = 100;
@@ -223,11 +233,11 @@ class Career {
     this.render();
   }
 
-  reset(){
+  reset() {
     this.money = 0;
     this.moneySpent = 0;
     this.startingDepth = 0;
-    this.upgrades = upgradeConf.map((_) => 0);  
+    this.upgrades = upgradeConf.map((_) => 0);
     this.render();
   }
 
@@ -289,7 +299,7 @@ class Career {
   }
 
   glubiniumChance(depth: number) {
-    return depth / 1000000 * this.upgrades[uGlu];
+    return (depth / 1000000) * this.upgrades[uGlu];
   }
 
   doUpgrade(u: number) {
@@ -315,13 +325,17 @@ class Career {
     let t = `Have: $[${this.money}] Spent:$[${this.moneySpent}]
     <div id="upgrades">${upgrades}</div><button id="newGame">New Game</button>
     from <select name="depth" id="depth">
-      ${[...new Array(this.upgrades[uDeep]+1)].map((_,i)=>`<option ${this.startingDepth == i*50?"selected":""} value="${i*50}">${i*50} m</option>`).join("")}
+      ${[...new Array(this.upgrades[uDeep] + 1)]
+        .map(
+          (_, i) =>
+            `<option ${this.startingDepth == i * 50 ? "selected" : ""} value="${
+              i * 50
+            }">${i * 50} m</option>`
+        )
+        .join("")}
     </select>    
     
-    `.replace(
-      /\[([*0-9]+)\]/g,
-      "<em>$1</em>"
-    );
+    `.replace(/\[([*0-9]+)\]/g, "<em>$1</em>");
     document.getElementById("outro").innerHTML = t;
   }
 }
@@ -342,16 +356,15 @@ class Field {
 
   depthCellChances: number[][] = [];
 
-  save(){
+  save() {
     let o = {};
     Object.assign(o, this);
     delete o["career"];
     localStorage.floodFillMinerField = JSON.stringify(o);
   }
 
-  load(){
-    if(!localStorage.floodFillMinerField)
-        return;
+  load() {
+    if (!localStorage.floodFillMinerField) return;
     let o = JSON.parse(localStorage.floodFillMinerField);
     Object.assign(this, o);
     this.updateStatus();
@@ -371,15 +384,14 @@ class Field {
     }
 
     let startingDepth = Number(this.career.startingDepth);
-    if(startingDepth>0){
-      this.scrollTo(startingDepth)
+    if (startingDepth > 0) {
+      this.scrollTo(startingDepth);
     }
 
     this.cells = [...new Array(this.w * this.h)].map((v, i) =>
       i < this.w ? captured : this.randomCellColor(i)
     );
     this.play(this.lastColor);
-
 
     this.updateScale();
     this.updateStatus();
@@ -390,12 +402,12 @@ class Field {
     this.depthCellChances[depth] = [...this.depthCellChances[depth - 1]];
     let increasing = Math.min(
       colorsNumber - 1,
-      1 + ~~(Math.random()**2 * colorsNumber)
+      1 + ~~(Math.random() ** 2 * colorsNumber)
     );
     if (depth * Math.random() * 8 > increasing ** 2.5)
       this.depthCellChances[depth][increasing] += 0.03;
     else this.depthCellChances[depth][increasing] *= 0.3;
-    this.depthCellChances[depth][glubinium-1] = this.career.glubiniumChance(
+    this.depthCellChances[depth][glubinium - 1] = this.career.glubiniumChance(
       depth
     );
     this.depthCellChances[depth] = balance(this.depthCellChances[depth]);
@@ -423,8 +435,8 @@ class Field {
     let depth = ~~this.depth + ~~(i / this.w);
     let color =
       1 + weightedRandom(this.depthCellChances[~~depth], () => Math.random());
-    for(let bonus = bonuses; bonus<=lastBonus; bonus++){
-      if(this.career.bonusFrequency(bonus)> Math.random()){
+    for (let bonus = bonuses; bonus <= lastBonus; bonus++) {
+      if (this.career.bonusFrequency(bonus) > Math.random()) {
         return bonus;
       }
     }
@@ -450,9 +462,9 @@ class Field {
     let captureColor: number[], capturedColor: number[];
 
     colors[glubinium] = [
-      ~~(Math.sin(t / 100) * 40 + 225),
-      ~~(Math.sin(t / 87) * 40 + 225),
-      ~~(Math.sin(t / 59) * 40 + 225),
+      ~~(Math.sin(t / 200) * 80 + 125),
+      ~~(Math.sin(t / 277) * 80 + 125),
+      ~~(Math.sin(t / 335) * 80 + 125),
       255,
     ];
 
@@ -499,14 +511,10 @@ class Field {
     cx.putImageData(id, 0, 0);
 
     let frame = document.getElementById("frame");
-    if(this.freeze && !this.multiplier)
-      frame.style.borderColor = "#0000ff"
-    if(!this.freeze && this.multiplier)
-      frame.style.borderColor = "#ffff00"
-    if(this.freeze && this.multiplier)
-      frame.style.borderColor = "#ff00ff"
-    if(!this.freeze && !this.multiplier)
-      frame.style.borderColor = "#fff1e8"
+    if (this.freeze && !this.multiplier) frame.style.borderColor = "#0000ff";
+    if (!this.freeze && this.multiplier) frame.style.borderColor = "#ffff00";
+    if (this.freeze && this.multiplier) frame.style.borderColor = "#ff00ff";
+    if (!this.freeze && !this.multiplier) frame.style.borderColor = "#fff1e8";
 
     //cx.clearRect(0,0,C.width, C.height);
     //cx.drawImage(this.canvas, 0, 0);
@@ -517,6 +525,19 @@ class Field {
 
   at(x: number, y: number) {
     return this.cells[x + y * this.w];
+  }
+
+  makeParticle(cell){
+    let p = document.createElement("div")
+    p.className = "particle";
+    p.innerHTML = "$";
+    p.style.left = `${this.scale * (cell%this.w)}px`;
+    p.style.top = `${this.scale * (~~(cell/this.w)-2)}px`;
+    p.style.color = hexColors[this.cells[cell]];
+    p.style.fontSize = `${5 + (price[this.cells[cell]] * this.totalMultiplier())**0.3}px`;
+    let frame = document.getElementById("frame");
+    frame.insertBefore(p,frame.firstChild);
+    setTimeout(() => p.remove(), 1000);
   }
 
   play(color: number) {
@@ -538,6 +559,7 @@ class Field {
             }
           }
         }
+        this.makeParticle(cell);
         this.cells[cell] = captured;
       }
       if (color <= glubinium) this.lastColor = color;
@@ -586,13 +608,13 @@ class Field {
 
   areaPrice(wbc: number[]) {
     let money = wbc
-      .map((i) => price[this.cells[i]-1] || 0)
+      .map((i) => price[this.cells[i] - 1] || 0)
       .reduce((a, b) => a + b, 0);
     money *= this.totalMultiplier();
     return money;
   }
 
-  totalMultiplier(){
+  totalMultiplier() {
     let m = this.career.multiplier();
     if (this.multiplier) {
       m *= this.career.bonusMultiplier();
@@ -705,7 +727,6 @@ class Field {
           }>${price[i] * this.totalMultiplier()}</span> `
       )
       .join("");
-    
   }
 }
 
@@ -726,7 +747,6 @@ window.onload = () => {
     "C"
   ) as HTMLCanvasElement;
 
-
   C.addEventListener("mousemove", (e) => {
     if (field == null) return;
     let [x, y] = [~~(e.offsetX / field.scale), ~~(e.offsetY / field.scale)];
@@ -737,6 +757,8 @@ window.onload = () => {
 
   C.addEventListener("click", (e) => {
     if (field == null) return;
+    //sound();
+
     let [x, y] = [~~(e.offsetX / field.scale), ~~(e.offsetY / field.scale)];
     field.play(field.at(x, y));
     field.save();
@@ -783,44 +805,42 @@ window.onload = () => {
       if (id.substr(0, 7) == "upgrade") {
         career.doUpgrade(Number(id.substr(8)));
       }
-      if(id=="resetProgress" && e.shiftKey){
+      if (id == "resetProgress" && e.shiftKey) {
         career.reset();
       }
-      if(id=="exit"){
+      if (id == "exit") {
         debrief();
       }
     }
   });
 
-  let lastLetters = ""
+  let lastLetters = "";
 
-  document.addEventListener("keydown", e=>{
+  document.addEventListener("keydown", (e) => {
     lastLetters += e.code[3];
-    while(lastLetters.length>8)
-      lastLetters = lastLetters.substr(1)    
-    if(lastLetters == "GIBMONEY"){
+    while (lastLetters.length > 8) lastLetters = lastLetters.substr(1);
+    if (lastLetters == "GIBMONEY") {
       career.money = Math.max(career.money, 5000000) * 2;
       career.render();
       career.save();
     }
 
-    if(e.key == "Escape"){
-      if(!field || !field.alive){
+    if (e.key == "Escape") {
+      if (!field || !field.alive) {
         newGame();
       }
     }
+  });
 
-  })
-
-  document.addEventListener("change", e=>{
-    if(e.target instanceof HTMLSelectElement && e.target.id == "depth"){
+  document.addEventListener("change", (e) => {
+    if (e.target instanceof HTMLSelectElement && e.target.id == "depth") {
       career.startingDepth = Number(e.target.value);
       career.render();
       career.save();
     }
-  })
+  });
 
-  if(localStorage.floodFillMinerField){
+  if (localStorage.floodFillMinerField) {
     newGame();
     field.load();
   }
