@@ -359,7 +359,7 @@
       p.style.left = `${this.scale * (cell % this.w)}px`;
       p.style.top = `${this.scale * (~~(cell / this.w) - 2)}px`;
       p.style.color = hexColors[this.cells[cell]];
-      p.style.fontSize = `${5 + (price[this.cells[cell]] * this.totalMultiplier()) ** 0.3}px`;
+      p.style.fontSize = `${10 + (price[this.cells[cell]] * this.totalMultiplier()) ** 0.3}px`;
       let frame = document.getElementById("frame");
       frame.insertBefore(p, frame.firstChild);
       setTimeout(() => p.remove(), 1e3);
