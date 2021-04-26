@@ -155,12 +155,11 @@ const piko8 = `#5F574F
 #FF004D
 #FF00AA`;
 
-
-const hexColors = ["#FFF", ...piko8.split("\n")]
+const hexColors = ["#FFF", ...piko8.split("\n")];
 
 const colors = [
   [255, 255, 255, 0],
-  ...piko8.split("\n").map((s) => hexToRGB(s))
+  ...piko8.split("\n").map((s) => hexToRGB(s)),
 ];
 
 const captured = 100;
@@ -208,7 +207,11 @@ function balance(a: number[]) {
 }
 
 function upgradeCost(unlock, tier) {
-  return baseUpgradeCost * (unlock + 1) * ((unlock == uFrF || unlock == uFrD)?4:2) ** tier;
+  return (
+    baseUpgradeCost *
+    (unlock + 1) *
+    (unlock == uFrF || unlock == uFrD ? 4 : 2) ** tier
+  );
 }
 
 function unlockUpgradeCost(unlock) {
@@ -283,7 +286,7 @@ class Career {
   }
 
   enrichChance() {
-    return 1 - 0.95 ** this.upgrades[uEnrP];
+    return 1 - 0.9 ** this.upgrades[uEnrP];
   }
 
   bonusFrequency(bonus: number) {
@@ -415,9 +418,9 @@ class Field {
     const C: HTMLCanvasElement = document.getElementById(
       "C"
     ) as HTMLCanvasElement;
-    C.width = this.w;
+    C.width = this.w * this.scale;
     C.style.width = `${this.w * this.scale}px`;
-    C.height = this.h;
+    C.height = this.h * this.scale;
     C.style.height = `${this.h * this.scale}px`;
 
     const frame = document.getElementById("frame");
@@ -474,12 +477,14 @@ class Field {
       capturedColor[3] = ~~(Math.sin(t / 100) * 20 + 225);
     }
 
-    let id = cx.getImageData(0, 0, this.w, this.h);
-    let pixels = id.data;
+    /*let id = cx.getImageData(0, 0, this.w, this.h);
+    let pixels = id.data;*/
 
     let letters = document.getElementById("letters");
     letters.innerHTML = "";
     letters.style.fontSize = `${this.scale / 2}px`;
+
+    cx.clearRect(0,0,this.w*this.scale, this.h*this.scale);
 
     for (let i = 0; i < this.cells.length; i++) {
       if (this.cells[i] >= bonuses) {
@@ -491,17 +496,19 @@ class Field {
           (~~(i / this.w) + 0.3) * this.scale
         }px">${bonusSymbols[this.cells[i]]}</div>`;
       }
-      pixels.set(
+      let color =
         this.cells[i] == captured
           ? capturedColor
           : wbc.includes(i)
           ? captureColor
-          : colors[this.cells[i]] || bonusBackground,
-        i * 4
-      );
+          : colors[this.cells[i]] || bonusBackground;
+
+      cx.fillStyle = `rgba(${color[0]},${color[1]},${color[2]},${color[3]/255})`
+      cx.fillRect(i%this.w * this.scale, ~~(i/this.w) * this.scale, this.scale, this.scale);
+      //pixels.set(color, i * 4);
     }
 
-    cx.putImageData(id, 0, 0);
+    //cx.putImageData(id, 0, 0);
 
     let frame = document.getElementById("frame");
     if (this.freeze && !this.multiplier) frame.style.borderColor = "#0000ff";
@@ -520,16 +527,20 @@ class Field {
     return this.cells[x + y * this.w];
   }
 
-  makeParticle(cell){
-    let p = document.createElement("div")
+  makeParticle(cell) {
+    let p = document.createElement("div");
     p.className = "particle";
     p.innerHTML = "$";
-    p.style.left = `${this.scale * (cell%this.w)}px`;
-    p.style.top = `${this.scale * (~~(cell/this.w)-2)}px`;
+    p.style.left = `${this.scale * ((cell % this.w) + Math.random() * 0.8)}px`;
+    p.style.top = `${
+      this.scale * (~~(cell / this.w) - 2 + Math.random() * 0.8)
+    }px`;
     p.style.color = hexColors[this.cells[cell]];
-    p.style.fontSize = `${10 + (price[this.cells[cell]] * this.totalMultiplier())**0.3}px`;
+    p.style.fontSize = `${
+      10 + (price[this.cells[cell]] * this.totalMultiplier()) ** 0.3
+    }px`;
     let frame = document.getElementById("frame");
-    frame.insertBefore(p,frame.firstChild);
+    frame.insertBefore(p, frame.firstChild);
     setTimeout(() => p.remove(), 1000);
   }
 
@@ -567,7 +578,7 @@ class Field {
         if (newDeepmost) {
           let newDepth = Math.max(
             newDeepmost - this.h / 2,
-            this.depth + 0.5 + this.turn * 0.02
+            this.depth + (this.turn < 3 ? 0 : 0.5 + this.turn * 0.02)
           );
           this.scrollTo(newDepth);
           this.updateStatus();

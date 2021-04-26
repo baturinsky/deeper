@@ -163,3 +163,7 @@ em {
   user-select: none;
   margin: 5px;
 }
+
+#instruction{
+  font-size: 90%;
+}

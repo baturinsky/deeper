@@ -1,0 +1,36 @@
+<html>
+
+<head>
+  <link rel="stylesheet" href="main.css" />
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <script src="bundle2.js"></script>
+</head>
+
+<body>
+  <div class="centered-content">
+    <div id="fieldFrame" style="visibility: hidden;">
+      <div id="title"></div>
+      <div id="frame">
+        <div id="letters"></div>
+        <canvas id="C">            
+          </canvas>
+      </div>
+      <div id="text"></div>
+      <div id="instruction">
+        Click on the adjacent area to claim it. 
+        You will get $ per captured tile, depending on color. 
+        More expensive colors lie deeper.
+        The field scrolls up faster with each turn.
+      </div>
+    </div>
+    <button id="exit">Exit</button>
+  </div>
+  <div id="ui"></div>
+  <div id="outroFrame" class="centered-content">
+    <div id="outro">      
+    </div>
+    <button id="resetProgress">Shift-click here to reset progress</button>
+  </div>
+</body>
+
+</html>

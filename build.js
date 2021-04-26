@@ -2,7 +2,7 @@ const esbuild = require('esbuild');
 
 esbuild.build({
 	entryPoints: ['./src/index.ts'],
-	outfile: './public/bundle.js',
+	outfile: './public/bundle2.js',
 	platform: 'browser',
 	bundle: true,
   watch: {
