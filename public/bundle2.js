@@ -238,7 +238,7 @@
       this.career = career;
       this.w = career.fieldWidth();
       this.h = career.fieldHeight();
-      this.depthCellChances[0] = balance([...new Array(colorsNumber)].map((n, i) => i < 4 ? 1 : 0));
+      this.depthCellChances[0] = balance([...new Array(colorsNumber)].map((n, i) => i < 5 ? 1 : 0));
       for (let depth = 1; depth < this.h * 2; depth++) {
         this.addDepthCellChances();
       }
@@ -254,6 +254,7 @@
     save() {
       let o = {};
       Object.assign(o, this);
+      this.career.save();
       delete o["career"];
       localStorage.floodFillMinerField = JSON.stringify(o);
     }
@@ -269,7 +270,7 @@
       this.depthCellChances[depth] = [...this.depthCellChances[depth - 1]];
       let increasing = Math.min(colorsNumber - 1, 1 + ~~(Math.random() ** 2 * colorsNumber));
       if (depth * Math.random() * 8 > increasing ** 2.5)
-        this.depthCellChances[depth][increasing] += 0.03;
+        this.depthCellChances[depth][increasing] += 0.05;
       else
         this.depthCellChances[depth][increasing] *= 0.3;
       this.depthCellChances[depth][glubinium - 1] = this.career.glubiniumChance(depth);
@@ -394,7 +395,7 @@
         } else {
           let newDeepmost2 = this.depth + ~~(Math.max(...wbc) / this.w);
           if (newDeepmost2) {
-            let newDepth = Math.max(newDeepmost2 - this.h / 2, this.depth + (this.turn < 3 ? 0 : 0.5 + this.turn * 0.02));
+            let newDepth = Math.max(newDeepmost2 - this.h / 2, this.depth + (this.turn < 3 ? 0 : 1 + this.turn * 0.02));
             this.scrollTo(newDepth);
             this.updateStatus();
           }
